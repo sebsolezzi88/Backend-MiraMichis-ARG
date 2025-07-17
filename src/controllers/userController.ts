@@ -42,3 +42,38 @@ export const registerUser = async (req:Request,res:Response):Promise<Response> =
         return res.status(500).json({status:'error', message: "Server Error."});
     }
 }
+
+export const activateAccount = async (req: Request, res: Response): Promise<Response> => {
+  const { token } = req.query;
+
+  if (!token || typeof token !== "string") {
+    return res.status(400).json({ status: "error", message: "Token is missing or invalid." });
+  }
+
+  try {
+    // Verificar el token
+    const decoded: any = jwt.verify(token, process.env.SECRET_KEY!);
+
+    // Buscar usuario por ID
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ status: "error", message: "User not found." });
+    }
+
+    // Verificar que el token coincida
+    if (user.activationToken !== token) {
+      return res.status(403).json({ status: "error", message: "Invalid activation token." });
+    }
+
+    // Activar usuario
+    user.isActive = true;
+    user.activationToken = undefined;
+    await user.save();
+
+    return res.status(200).json({ status: "success", message: "Account activated successfully." });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(401).json({ status: "error", message: "Token is invalid or expired." });
+  }
+};
