@@ -77,3 +77,40 @@ export const activateAccount = async (req: Request, res: Response): Promise<Resp
     return res.status(401).json({ status: "error", message: "Token is invalid or expired." });
   }
 };
+export const loginUser = async (req:Request,res:Response):Promise<Response> =>{
+    const errors = validationResult(req);
+    
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { username, password } = req.body;
+
+    try {
+        const user = await User.findOne({ username });
+
+        //El usuario no esta registrado
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        //Si los password no coinciden
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        //Si el usuario no esta activado
+        if (!user.isActive) {
+            return res.status(403).json({ message: 'Account not activated' });
+        }
+
+      
+        const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY!, { expiresIn: '7d' });
+
+        return res.status(200).json({ message: 'Login successful',username:user.username ,token });
+    } catch (error) {
+        return res.status(500).json({ message: 'Server error' });
+    }
+}
