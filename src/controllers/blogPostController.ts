@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import BlogPost from "../models/BlogPost";
 import { validationResult } from "express-validator";
+import { Types } from "mongoose";
 
 export const creatBlogPost = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -64,11 +65,28 @@ export const updateBlogPost = async (req: Request, res: Response): Promise<Respo
 export const getBlogPostById = async (req: Request, res: Response): Promise<Response> => {
     try {
         
-        
+        const id = req.params.blogPostId;
+
+        if (!Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ 
+                status: "error",
+                message: "Invalid blog post ID.",
+            });
+        }
+
+        const blogPost = await BlogPost.findById(id);
+
+        if(!blogPost){
+            return res.status(404).json({ 
+            status:"error", 
+            message: "Blog post not found", 
+        });
+        }
 
         return res.status(200).json({ 
             status:"success", 
-            message: "ok", 
+            message: "Blog post found", 
+            blogPost
         });
     } catch (error) {
         console.error("Error send Message:", error);
@@ -83,7 +101,7 @@ export const getBlogPosts = async (req: Request, res: Response): Promise<Respons
 
         return res.status(200).json({ 
             status:"success", 
-            message: "Blog post found", 
+            message: "Blog posts found", 
             blogPost
         });
     } catch (error) {
