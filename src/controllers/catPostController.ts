@@ -138,3 +138,34 @@ export const deleteCatPostById = async (req: Request, res: Response): Promise<Re
     return res.status(500).json({ status:"error", message: "Server error" });
   }
 }
+
+export const updateCatPostStatus = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { id } = req.params;
+    const existingPost = await CatPost.findById(id);
+    
+    if(!existingPost){
+      return res.status(404).json({ status:"error", message: "CatPost not found" });
+    }
+
+    //Si existe el post comprobamos que pertenesca al mismo usuario
+    if(!existingPost.userId || existingPost.userId.toString() !== req.userId!.toString() ){
+      return res.status(403).json({ status:"error" ,message: "Unauthorized: You do not own this post" });
+    }
+
+    //Cambiar el estado del post
+    if(existingPost.publicationStatus === 'resuelto'){
+      existingPost.publicationStatus = 'activo';
+    }else{
+      existingPost.publicationStatus = 'resuelto';
+    }
+
+    await existingPost.save() //Guardar cambios;
+    
+    return res.status(200).json({ status:"success", message: "Status change" });
+
+  } catch (error) {
+    console.error("Error delete post:", error);
+    return res.status(500).json({ status:"error", message: "Server error" });
+  }
+}

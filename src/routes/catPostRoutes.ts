@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { createCatPost, deleteCatPostById, getAllCatPosts, getCatPostById } from "../controllers/catPostController";
+import { createCatPost, deleteCatPostById, getAllCatPosts, getCatPostById, updateCatPostStatus } from "../controllers/catPostController";
 import { verifyToken } from "../middlewares/authMiddleware";
 import uploadImage from "../middlewares/uploadImage";
 import { AuthRequest } from "../types/express";
@@ -11,6 +11,7 @@ const router = Router();
 router.get('/',getAllCatPosts); //Obtener todos los post
 router.get('/:id', getCatPostById);   // Obtener un catpost por ID
 router.delete('/:id',verifyToken ,deleteCatPostById);      // Eliminar un catpost por ID
+router.patch('/:id/status',verifyToken ,updateCatPostStatus);//Actualizar estado activo/resuelto
 router.post('/',verifyToken,
     uploadImage.single('photo'),(req: Request, res: Response, next: NextFunction) => {
     // TypeScript sabe que 'req' es 'Request' aquí.
