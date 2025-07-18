@@ -23,7 +23,7 @@ export const creatBlogPost = async (req: Request, res: Response): Promise<Respon
             userId:req.userId
         })
 
-        return res.status(200).json({ 
+        return res.status(201).json({ 
             status:"success", 
             message: "Blog post Created",
             blogPost: newBlogPost 
@@ -40,7 +40,7 @@ export const deleteBlogPost = async (req: Request, res: Response): Promise<Respo
 
         return res.status(200).json({ 
             status:"success", 
-            message: "ok", 
+            message: "Blog post Deleted", 
         });
     } catch (error) {
         console.error("Error send Message:", error);
@@ -64,7 +64,7 @@ export const updateBlogPost = async (req: Request, res: Response): Promise<Respo
 export const getBlogPostById = async (req: Request, res: Response): Promise<Response> => {
     try {
         
-  
+        
 
         return res.status(200).json({ 
             status:"success", 
@@ -78,11 +78,13 @@ export const getBlogPostById = async (req: Request, res: Response): Promise<Resp
 export const getBlogPosts = async (req: Request, res: Response): Promise<Response> => {
     try {
         
+        const blogPost = await BlogPost.find();
   
 
         return res.status(200).json({ 
             status:"success", 
-            message: "ok", 
+            message: "Blog post found", 
+            blogPost
         });
     } catch (error) {
         console.error("Error send Message:", error);
