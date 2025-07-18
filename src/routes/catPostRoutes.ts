@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { createCatPost, deleteCatPostById, getAllCatPosts, getCatPostById, getCatPostsByUser, updateCatPostStatus } from "../controllers/catPostController";
+import { createCatPost, deleteCatPostById, getAllCatPosts, getCatPostById, getCatPostsByUser, updateCatPostById, updateCatPostStatus } from "../controllers/catPostController";
 import { verifyToken } from "../middlewares/authMiddleware";
 import uploadImage from "../middlewares/uploadImage";
 import { AuthRequest } from "../types/express";
@@ -21,6 +21,7 @@ router.post('/',verifyToken,
     createCatPost(req as AuthRequest, res);
   }
 ); //Crear post
+router.put('/:id',verifyToken,uploadImage.single('photo'),updateCatPostById); //Actulizar post
 
 
 

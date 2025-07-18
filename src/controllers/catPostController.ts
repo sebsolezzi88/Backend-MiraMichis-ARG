@@ -19,7 +19,7 @@ export const createCatPost = async (req:AuthRequest,res:Response)=>{
     const result = await cloudinary.uploader.upload(req.file.path || `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
       folder: 'catposts', // Carpeta donde se guardarán las imágenes en Cloudinary
     });
-    console.log(result);
+    
     // 3. Obtener la URL y el ID público de la imagen de Cloudinary
     const photoUrl = result.secure_url; // URL segura de la imagen
     const photoId = result.public_id; // ID público de la imagen (útil para eliminarla después)
@@ -138,6 +138,68 @@ export const deleteCatPostById = async (req: Request, res: Response): Promise<Re
     return res.status(500).json({ status:"error", message: "Server error" });
   }
 }
+
+export const updateCatPostById = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { id } = req.params;
+
+    const {
+      typeOfPublication,
+      gender,
+      catName,
+      age,
+      description,
+      breed,
+      city,
+      province,
+    } = req.body;
+
+    const existingPost = await CatPost.findById(id);
+
+    if (!existingPost) {
+      return res.status(404).json({ message: "CatPost not found" });
+    }
+     // Verificar que el post le pertenece al usuario logueado
+    if (!existingPost.userId || existingPost.userId.toString() !== req.userId!.toString()) {
+      return res.status(403).json({ message: "Unauthorized: You do not own this post" });
+    }
+
+    // Si hay nueva imagen
+    if (req.file) {
+      // Borrar la imagen anterior en Cloudinary
+      if (existingPost.photoId) {
+        await cloudinary.uploader.destroy(existingPost.photoId);
+      }
+
+      const result = await cloudinary.uploader.upload(req.file.path || `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
+      folder: 'catposts', // Carpeta donde se guardarán las imágenes en Cloudinary
+    });
+    
+        //Obtener la URL y el ID público de la imagen de Cloudinary
+        const photoUrl = result.secure_url; // URL segura de la imagen
+        const photoId = result.public_id; // ID público de la imagen (útil para eliminarla después)
+
+      existingPost.photoUrl = photoUrl;
+      existingPost.photoId = photoId;
+    }
+
+    // Actualizar otros campos
+    existingPost.typeOfPublication = typeOfPublication;
+    existingPost.gender = gender;
+    existingPost.catName = catName;
+    existingPost.age = age;
+    existingPost.description = description;
+    existingPost.breed = breed;
+    existingPost.location = { city, province };
+
+    await existingPost.save();
+
+    return res.status(200).json({ message: "CatPost updated", post: existingPost });
+  } catch (error) {
+    console.error("Error updating post:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 
 export const updateCatPostStatus = async (req: Request, res: Response): Promise<Response> => {
   try {
