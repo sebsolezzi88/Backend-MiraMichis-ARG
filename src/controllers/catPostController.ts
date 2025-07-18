@@ -6,7 +6,7 @@ import Comment from "../models/Commet";
 
 
 
-export const createCatPost = async (req:AuthRequest,res:Response)=>{
+export const createCatPost = async (req:Request,res:Response)=>{
 
     try {
     // 1. Verificar si hay un archivo de imagen

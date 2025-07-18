@@ -13,16 +13,16 @@ router.get('/:id', getCatPostById);   // Obtener un catpost por ID
 router.get('/user/:userId', getCatPostsByUser);  //Obtener todos los post de un usuario
 router.delete('/:id',verifyToken ,deleteCatPostById);      // Eliminar un catpost por ID
 router.patch('/:id/status',verifyToken ,updateCatPostStatus);//Actualizar estado activo/resuelto
-router.post('/',verifyToken,
+/* router.post('/',verifyToken,
     uploadImage.single('photo'),(req: Request, res: Response, next: NextFunction) => {
     // TypeScript sabe que 'req' es 'Request' aquí.
     // Usamos 'as AuthRequest' para decirle a TypeScript que ahora sabemos que 'req' es un AuthRequest.
     // Esto asume que 'verifyToken' SIEMPRE establece 'userId' y 'userRol'.
     createCatPost(req as AuthRequest, res);
   }
-); //Crear post
+) */; //Crear post
 router.put('/:id',verifyToken,uploadImage.single('photo'),updateCatPostById); //Actulizar post
-
+router.post('/',verifyToken,uploadImage.single('photo'),createCatPost);
 
 
 export default router;
