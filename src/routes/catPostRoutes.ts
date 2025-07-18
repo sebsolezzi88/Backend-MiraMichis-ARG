@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { createCatPost } from "../controllers/catPostController";
 import { verifyToken } from "../middlewares/authMiddleware";
+import uploadImage from "../middlewares/uploadImage";
 
 
 
 const router = Router();
 
-router.post('/',verifyToken,createCatPost); //Crear post
+router.post('/',verifyToken,uploadImage.single('photo'),createCatPost); //Crear post
 
 
 
