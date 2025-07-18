@@ -1,13 +1,25 @@
 import { Request, Response } from "express";
+import BlogPost from "../models/BlogPost";
 
 export const creatBlogPost = async (req: Request, res: Response): Promise<Response> => {
     try {
         
-  
+        const{
+            title,text,link,typeOfBlogPost
+        } = req.body;
+
+        const newBlogPost = await BlogPost.create({
+            title:title,
+            text:text,
+            link:link,
+            typeOfBlogPost:typeOfBlogPost,
+            userId:req.userId
+        })
 
         return res.status(200).json({ 
             status:"success", 
-            message: "ok", 
+            message: "Blog post Created",
+            blogPost: newBlogPost 
         });
     } catch (error) {
         console.error("Error send Message:", error);
