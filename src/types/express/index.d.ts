@@ -10,3 +10,8 @@ declare global {
     }
   }
 }
+
+export interface AuthRequest extends Request {
+  userId: ObjectId; // Aquí los haces NO opcionales porque sabes que verifyToken los establece
+  userRol: string;  // Si verifyToken garantiza que siempre estarán presentes
+}
