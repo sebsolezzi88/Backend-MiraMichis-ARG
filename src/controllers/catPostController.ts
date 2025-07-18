@@ -87,3 +87,22 @@ export const getAllCatPosts = async (req: Request, res: Response): Promise<Respo
     return res.status(500).json({ status:"error", message: "Server error" });
   }
 }
+
+export const getCatPostById = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    
+    const {id} = req.params;
+
+    const existingPost = await CatPost.findById(id);
+
+    if(!existingPost){
+      return res.status(404).json({ status:"error", message: "Post not Found"});
+    }
+    
+    return res.status(200).json({ status:"success", message: "Post Found", post:existingPost });
+
+  } catch (error) {
+    console.error("Error delete post:", error);
+    return res.status(500).json({ status:"error", message: "Server error" });
+  }
+}
