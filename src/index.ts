@@ -5,6 +5,7 @@ import "./models/loadModels";
 import { getMongoConnection } from "./config/db";
 import userRoutes from './routes/userRoutes';
 import catPostRoutes from './routes/catPostRoutes';
+import catCommentRoutes from './routes/catCommentRoutes';
 
 
 //Cargar variable de entorno
@@ -20,6 +21,7 @@ getMongoConnection(); //Conexion con la base de datos
 
 app.use('/api/user',userRoutes); //Rutas de User
 app.use('/api/catpost',catPostRoutes); //Rutas de catpost
+app.use('/api/catpost',catCommentRoutes); //Rutas para los comentarios  de post de gatos
 
 
 app.listen(PORT, ()=>{
