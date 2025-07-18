@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import cloudinary from "../config/cloudinary";
 import CatPost from "../models/CatPost";
+import { AuthRequest } from "../types/express";
 
-export const createCatPost = async (req:Request,res:Response)=>{
+
+
+export const createCatPost = async (req:AuthRequest,res:Response)=>{
 
     try {
     // 1. Verificar si hay un archivo de imagen
@@ -13,9 +16,9 @@ export const createCatPost = async (req:Request,res:Response)=>{
     // 2. Subir la imagen a Cloudinary
     // req.file.buffer contiene los datos binarios de la imagen
     const result = await cloudinary.uploader.upload(req.file.path || `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
-      folder: 'cat_posts', // Carpeta donde se guardarán las imágenes en Cloudinary
+      folder: 'catposts', // Carpeta donde se guardarán las imágenes en Cloudinary
     });
-
+    console.log(result);
     // 3. Obtener la URL y el ID público de la imagen de Cloudinary
     const photoUrl = result.secure_url; // URL segura de la imagen
     const photoId = result.public_id; // ID público de la imagen (útil para eliminarla después)
@@ -31,17 +34,19 @@ export const createCatPost = async (req:Request,res:Response)=>{
       province,
     } = req.body;
 
-    // 5. Validar los datos (Express-validator se encargaría de esto en un caso real)
-    if (!typeOfPublication || !gender || !description || !location) {
+    //  Validar los datos (Express-validator se encargaría de esto en un caso real)
+    if (!typeOfPublication || !gender || !description || !city  || !province) {
         return res.status(400).json({ message: 'Faltan campos obligatorios.' });
     }
 
-    // 6. Obtener userId 
+    //  Obtener userId 
     const userId = req.userId; 
+
+    const location = {city,province};
 
    
     // 7. Crear el nuevo post del gato
-    const newCatPost =  CatPost.create({
+    const newCatPost = await CatPost.create({
       userId,
       typeOfPublication,
       gender,
@@ -49,7 +54,7 @@ export const createCatPost = async (req:Request,res:Response)=>{
       age,
       description,
       breed,
-      location: { city, province },
+      location,
       photoUrl,
       photoId
     })
