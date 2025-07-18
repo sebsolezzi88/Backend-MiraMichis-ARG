@@ -69,12 +69,50 @@ export const deleteBlogPost = async (req: Request, res: Response): Promise<Respo
 export const updateBlogPost = async (req: Request, res: Response): Promise<Response> => {
     try {
         
-  
+        //Comprobar errores
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({errors:errors.array()}); //Si hay errores los enviamos
+        }
 
-        return res.status(200).json({ 
+        const{
+            title,text,link,typeOfBlogPost
+        } = req.body;
+
+        const id = req.params.blogPostId;
+
+        if (!Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ 
+                status: "error",
+                message: "Invalid blog post ID.",
+            });
+        }
+
+        const blogPost = await BlogPost.findById(id);
+
+        if(!blogPost){
+            return res.status(404).json({ 
+                status:"error", 
+                message: "Blog post not found", 
+            });
+        }
+
+        //Actualizar blog post
+        blogPost.title = title;
+        blogPost.link = link;
+        blogPost.text = text;
+        blogPost.typeOfBlogPost =typeOfBlogPost;
+
+        await blogPost.save(); //Guardar cambios
+
+        
+
+        return res.status(201).json({ 
             status:"success", 
-            message: "ok", 
+            message: "Blog post Updated",
+            blogPost 
         });
+        
     } catch (error) {
         console.error("Error send Message:", error);
         return res.status(500).json({ status:"error", message: "Server error" });
@@ -114,13 +152,13 @@ export const getBlogPostById = async (req: Request, res: Response): Promise<Resp
 export const getBlogPosts = async (req: Request, res: Response): Promise<Response> => {
     try {
         
-        const blogPost = await BlogPost.find();
+        const blogPosts = await BlogPost.find();
   
 
         return res.status(200).json({ 
             status:"success", 
             message: "Blog posts found", 
-            blogPost
+            blogPosts
         });
     } catch (error) {
         console.error("Error send Message:", error);
