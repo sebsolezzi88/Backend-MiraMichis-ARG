@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { validationResult } from "express-validator";
 import User from "../models/User";
 import { transporter } from "../config/mail";
+import cloudinary from "../config/cloudinary";
 
 export const registerUser = async (req:Request,res:Response):Promise<Response> =>{
     try {
@@ -112,5 +113,59 @@ export const loginUser = async (req:Request,res:Response):Promise<Response> =>{
         return res.status(200).json({ message: 'Login successful',username:user.username ,token });
     } catch (error) {
         return res.status(500).json({ message: 'Server error' });
+    }
+}
+
+export const updateProfile = async (req:Request,res:Response):Promise<Response> =>{
+    
+    try {
+      const { name, lastName, bio, city, province  } = req.body;
+      
+      // 1. Verificar si hay un archivo de imagen
+          if (!req.file) {
+            return res.status(400).json({ message: 'No se proporcionó ninguna imagen.' });
+          }
+      
+          // 2. Subir la imagen a Cloudinary
+          // req.file.buffer contiene los datos binarios de la imagen
+          const result = await cloudinary.uploader.upload(req.file.path || `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
+            folder: 'useravatar', // Carpeta donde se guardarán las imágenes en Cloudinary
+          });
+          
+          // 3. Obtener la URL y el ID público de la imagen de Cloudinary
+          const photoUrl = result.secure_url; // URL segura de la imagen
+          const photoId = result.public_id; // ID público de la imagen (útil para eliminarla después)
+
+      const user = await User.findById(req.userId);
+
+      //El usuario no esta registrado
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      if (req.file) {
+        // Borrar la imagen anterior en Cloudinary
+        if (user.avatarId) {
+          await cloudinary.uploader.destroy(user.avatarId);
+        }
+        user.avatarUrl = photoUrl;
+        user.avatarId= photoId;
+      }
+        
+      //Actualizamos los datos en el usuario
+      user.name = name;
+      user.lastName = lastName;
+      user.bio = bio;
+      user.location.city = city;
+      user.location.province= province;
+        
+
+      //Guardamos los cambios
+      await user.save();
+
+      return res.status(200).json({ status:'success', message: 'Update successful' });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({status:'error', message: 'Server error' });
     }
 }
