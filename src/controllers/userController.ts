@@ -116,56 +116,64 @@ export const loginUser = async (req:Request,res:Response):Promise<Response> =>{
     }
 }
 
-export const updateProfile = async (req:Request,res:Response):Promise<Response> =>{
-    
-    try {
-      const { name, lastName, bio, city, province  } = req.body;
-      
-      // 1. Verificar si hay un archivo de imagen
-          if (!req.file) {
-            return res.status(400).json({ message: 'No se proporcionó ninguna imagen.' });
-          }
-      
-          // 2. Subir la imagen a Cloudinary
-          // req.file.buffer contiene los datos binarios de la imagen
-          const result = await cloudinary.uploader.upload(req.file.path || `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
-            folder: 'useravatar', // Carpeta donde se guardarán las imágenes en Cloudinary
-          });
-          
-          // 3. Obtener la URL y el ID público de la imagen de Cloudinary
-          const photoUrl = result.secure_url; // URL segura de la imagen
-          const photoId = result.public_id; // ID público de la imagen (útil para eliminarla después)
+export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { name, lastName, bio, city, province } = req.body; // Campos del cuerpo de la solicitud
 
-      const user = await User.findById(req.userId);
+    const user = await User.findById(req.userId); 
 
-      //El usuario no esta registrado
-      if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-
-      if (req.file) {
-        // Borrar la imagen anterior en Cloudinary
-        if (user.avatarId) {
-          await cloudinary.uploader.destroy(user.avatarId);
-        }
-        user.avatarUrl = photoUrl;
-        user.avatarId= photoId;
-      }
-        
-      //Actualizamos los datos en el usuario
-      user.name = name;
-      user.lastName = lastName;
-      user.bio = bio;
-      user.location.city = city;
-      user.location.province= province;
-        
-
-      //Guardamos los cambios
-      await user.save();
-
-      return res.status(200).json({ status:'success', message: 'Update successful' });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({status:'error', message: 'Server error' });
+    // Buena practica volver a verificar el username
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
+
+    let photoUrl: string | undefined;
+    let photoId: string | undefined;
+
+    // --- Lógica para la imagen (Opcional) ---
+    // 1. Verificar si hay un archivo de imagen en la solicitud
+    if (req.file) { // Solo ejecuta esto si se proporcionó una imagen
+      // 2. Subir la imagen a Cloudinary
+      const result = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`, {
+        folder: 'useravatar', // Carpeta donde se guardarán las imágenes en Cloudinary
+      });
+
+      // 3. Obtener la URL y el ID público de la imagen de Cloudinary
+      photoUrl = result.secure_url;
+      photoId = result.public_id;
+
+      // Borrar la imagen anterior en Cloudinary (solo si se subió una nueva)
+      if (user.avatarId) {
+        await cloudinary.uploader.destroy(user.avatarId);
+      }
+      user.avatarUrl = photoUrl;
+      user.avatarId = photoId;
+    }
+    // --- Fin de la lógica para la imagen ---
+
+    // Actualizamos los datos del usuario (siempre se actualizan si están en el body)
+    // Solo actualiza si los campos están presentes en el body, para permitir actualizaciones parciales
+    if (name !== undefined) user.name = name;
+    if (lastName !== undefined) user.lastName = lastName;
+    if (bio !== undefined) user.bio = bio;
+    
+    // Asegurarse de que location exista antes de acceder a sus propiedades
+    if (user.location) {
+        if (city !== undefined) user.location.city = city;
+        if (province !== undefined) user.location.province = province;
+    } else {
+        // Si no existe user.location, puedes inicializarlo o manejar el error
+        user.location = { city: city || '', province: province || '' }; // Asumiendo que City y Province son strings
+    }
+      
+    // Guardamos los cambios
+    await user.save();
+
+    return res.status(200).json({ status: 'success', message: 'Update successful', user }); 
+  } catch (error) {
+    console.error('Error al actualizar el perfil:', error);
+    // Puedes añadir lógica para borrar la imagen de Cloudinary si la subida fue exitosa
+    // pero la actualización de la DB falló.
+    return res.status(500).json({ status: 'error', message: 'Server error' });
+  }
 }
