@@ -21,7 +21,14 @@ export const validateUserRegister = [
 
   body('email')
     .notEmpty().withMessage('Email is required')
-    .isEmail().withMessage('Email must be valid'),
+    .isEmail().withMessage('Email must be valid')
+    .custom(async (value) => {
+      const existingUser = await User.findOne({ email: value });
+      if (existingUser) {
+        throw new Error('Email already in use');
+      }
+      return true;
+    }),
 
   body('password')
     .notEmpty().withMessage('Password is required')
