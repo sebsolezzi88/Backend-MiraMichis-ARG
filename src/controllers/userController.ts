@@ -107,10 +107,17 @@ export const loginUser = async (req:Request,res:Response):Promise<Response> =>{
             return res.status(403).json({ message: 'Account not activated' });
         }
 
-      
         const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY!, { expiresIn: '7d' });
 
-        return res.status(200).json({ message: 'Login successful',username:user.username ,token });
+         const userLogin ={
+          username: user.username,
+          name: user.name,
+          lastName: user.lastName,
+          role: user.role,
+          token
+        }
+
+        return res.status(200).json({ message: 'Login successful',user:userLogin });
     } catch (error) {
         return res.status(500).json({ message: 'Server error' });
     }
