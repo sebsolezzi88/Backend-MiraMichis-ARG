@@ -92,19 +92,19 @@ export const loginUser = async (req:Request,res:Response):Promise<Response> =>{
 
         //El usuario no esta registrado
         if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ status:'error', message: 'Invalid credentials' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
 
         //Si los password no coinciden
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ status:'error', message: 'Invalid credentials' });
         }
 
         //Si el usuario no esta activado
         if (!user.isActive) {
-            return res.status(403).json({ message: 'Account not activated' });
+            return res.status(403).json({ status:'error', message: 'Account not activated' });
         }
 
         const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY!, { expiresIn: '7d' });
@@ -117,9 +117,9 @@ export const loginUser = async (req:Request,res:Response):Promise<Response> =>{
           token
         }
 
-        return res.status(200).json({ message: 'Login successful',user:userLogin });
+        return res.status(200).json({ status:'success', message: 'Login successful',user:userLogin });
     } catch (error) {
-        return res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ status:'error', message: 'Server error' });
     }
 }
 
