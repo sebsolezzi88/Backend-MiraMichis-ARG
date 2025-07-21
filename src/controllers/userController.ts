@@ -223,3 +223,11 @@ export const generateNewToken = async (req: Request, res: Response): Promise<Res
     return res.status(500).json({ status: 'error', message: 'Server error' });
   }
 }
+
+export const updatePassword = async (req: Request, res: Response): Promise<Response> =>{
+  try {
+    return res.status(200).json({ status:'success', message: 'Password updated' });
+  } catch (error) {
+        return res.status(500).json({ status:'error', message: 'Server error' });
+  }
+}
