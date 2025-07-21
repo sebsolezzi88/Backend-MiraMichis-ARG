@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import { validationResult } from "express-validator";
 import User from "../models/User";
 import { transporter } from "../config/mail";
@@ -243,11 +243,16 @@ export const updatePassword = async (req: Request, res: Response): Promise<Respo
     }
     //Si coincide el usuario actulizamos su password
     user.password = password;
+    user.activationToken='';
     await user.save()
 
     return res.status(200).json({ status:'success', message: 'Password updated' });
-    
-  } catch (error) {
-        return res.status(500).json({ status:'error', message: 'Server error' });
+
+  } catch (error:unknown) {
+    if(error instanceof JsonWebTokenError){
+      return res.status(400).json({ status:'error', message: 'Token invalid' });
+    }
+    console.log(error);
+    return res.status(500).json({ status:'error', message: 'Server error' });
   }
 }
