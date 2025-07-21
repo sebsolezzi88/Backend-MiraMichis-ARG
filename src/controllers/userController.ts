@@ -215,7 +215,7 @@ export const generateNewToken = async (req: Request, res: Response): Promise<Res
         subject: "Reestablece tu contraseña",
         html: `<p>Hola ${user.name}, puedes reestablecer tu password dando clic en el siguiente enlace:</p>
                 <p>Si no has sido tu, puedes ignorar este mensaje</p>
-                <a href="${activationUrl} taget=_blanck">Reestablecer Password</a>`
+                <a href="${activationUrl}">Reestablecer Password</a>`
         });
     return res.status(200).json( {status:'success', message: 'Token generated'});
   }catch (error) {
