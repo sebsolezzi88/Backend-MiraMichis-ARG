@@ -206,7 +206,7 @@ export const generateNewToken = async (req: Request, res: Response): Promise<Res
         user.activationToken = activationToken; //Guardar token en el usuario creado
         await user.save();
 
-        const activationUrl = `http://localhost:5173/restard_password?token=${activationToken}`;
+        const activationUrl = `http://localhost:5173/reset_password?token=${activationToken}`;
 
         //Mandar mail
         await transporter.sendMail({
