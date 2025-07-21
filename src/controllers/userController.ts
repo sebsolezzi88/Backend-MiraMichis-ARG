@@ -184,3 +184,42 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
     return res.status(500).json({ status: 'error', message: 'Server error' });
   }
 }
+
+export const generateNewToken = async (req: Request, res: Response): Promise<Response> =>{
+  
+  const {email} = req.body;
+
+  if(!email || email.trim() ===''){
+    return res.status(404).json( {status:'error', message: 'The email ir requered'});
+  }
+  try{
+    const user = await User.findOne({email})
+    if(!user){
+      return res.status(404).json( {status:'error', message: 'User not Found'});
+    }
+    //generar nuevo token para que el usuario recupere su cuenta
+
+    const activationToken = jwt.sign({ id: user._id },
+            process.env.SECRET_KEY!,
+            { expiresIn: '1d' }
+        );
+        user.activationToken = activationToken; //Guardar token en el usuario creado
+        await user.save();
+
+        const activationUrl = `http://localhost:5173/restard_password?token=${activationToken}`;
+
+        //Mandar mail
+        await transporter.sendMail({
+        from: '"Red Social de Michis 🐱" <no-reply@michinet.com>',
+        to: user.email,
+        subject: "Reestablece tu contraseña",
+        html: `<p>Hola ${user.name}, puedes reestablecer tu password dando clic en el siguiente enlace:</p>
+                <p>Si no has sido tu, puedes ignorar este mensaje</p>
+                <a href="${activationUrl} taget=_blanck">Reestablecer Password</a>`
+        });
+    return res.status(200).json( {status:'success', message: 'Token generated'});
+  }catch (error) {
+    console.error('Error al generar token:', error);
+    return res.status(500).json({ status: 'error', message: 'Server error' });
+  }
+}
