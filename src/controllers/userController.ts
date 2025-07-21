@@ -226,7 +226,27 @@ export const generateNewToken = async (req: Request, res: Response): Promise<Res
 
 export const updatePassword = async (req: Request, res: Response): Promise<Response> =>{
   try {
+    const {password, passwordrep ,token} = req.body;
+    if(!password || !passwordrep || !token){
+       return res.status(400).json({ status:'success', message: 'Password and Token are Requeried' });
+    }
+    if(!password !== !passwordrep ){
+       return res.status(400).json({ status:'success', message: 'Password must match' });
+    }
+    // Verificar el token
+    const decoded: any = jwt.verify(token, process.env.SECRET_KEY!);
+
+    // Buscar usuario por ID
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ status: "error", message: "User not found." });
+    }
+    //Si coincide el usuario actulizamos su password
+    user.password = password;
+    await user.save()
+
     return res.status(200).json({ status:'success', message: 'Password updated' });
+    
   } catch (error) {
         return res.status(500).json({ status:'error', message: 'Server error' });
   }
