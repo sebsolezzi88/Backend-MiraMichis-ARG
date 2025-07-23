@@ -35,6 +35,7 @@ export const createCatPost = async (req:Request,res:Response)=>{
       province,
     } = req.body;
 
+    console.log(typeOfPublication,gender,description,city,province)
     //  Validar los datos (Express-validator se encargaría de esto en un caso real)
     if (!typeOfPublication || !gender || !description || !city  || !province) {
         return res.status(400).json({status:'error', message: 'Faltan campos obligatorios.' });
