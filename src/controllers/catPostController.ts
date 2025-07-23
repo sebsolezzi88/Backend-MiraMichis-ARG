@@ -237,7 +237,7 @@ export const getCatPostsByUser = async (req: Request, res: Response): Promise<Re
   try {
     const { userId } = req.params;
     
-    const existingPosts = await CatPost.find({ userId});
+    const existingPosts = await CatPost.find({ userId}).sort({date:-1});
     
     return res.status(200).json({ status:"success", message: "Post Found", posts:existingPosts });
 
