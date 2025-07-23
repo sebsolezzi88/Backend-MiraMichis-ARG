@@ -11,7 +11,7 @@ export const createCatPost = async (req:Request,res:Response)=>{
     try {
     // 1. Verificar si hay un archivo de imagen
     if (!req.file) {
-      return res.status(400).json({ message: 'No se proporcionó ninguna imagen.' });
+      return res.status(400).json({ status:'error', message: 'No se proporcionó ninguna imagen.' });
     }
 
     // 2. Subir la imagen a Cloudinary
@@ -37,7 +37,7 @@ export const createCatPost = async (req:Request,res:Response)=>{
 
     //  Validar los datos (Express-validator se encargaría de esto en un caso real)
     if (!typeOfPublication || !gender || !description || !city  || !province) {
-        return res.status(400).json({ message: 'Faltan campos obligatorios.' });
+        return res.status(400).json({status:'error', message: 'Faltan campos obligatorios.' });
     }
 
     //  Obtener userId 
@@ -61,6 +61,7 @@ export const createCatPost = async (req:Request,res:Response)=>{
     })
 
     res.status(201).json({ 
+      status:'success',
       message: 'Post de gato creado exitosamente.', 
       post: newCatPost 
     });
@@ -72,7 +73,7 @@ export const createCatPost = async (req:Request,res:Response)=>{
     if (req.file && (error as any).public_id) { // Solo un ejemplo, la lógica real es más compleja
       await cloudinary.uploader.destroy((error as any).public_id);
     }
-    res.status(500).json({ message: 'Error interno del servidor al crear el post.' });
+    res.status(500).json({ status:'error',message: 'Error interno del servidor al crear el post.' });
   }
 }
 
