@@ -196,7 +196,7 @@ export const updateCatPostById = async (req: Request, res: Response): Promise<Re
 
     await existingPost.save();
 
-    return res.status(200).json({ message: "CatPost updated", post: existingPost });
+    return res.status(200).json({ status:'success', message: "CatPost updated", post: existingPost });
   } catch (error) {
     console.error("Error updating post:", error);
     return res.status(500).json({ message: "Server error" });
