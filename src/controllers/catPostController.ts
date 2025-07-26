@@ -81,7 +81,7 @@ export const createCatPost = async (req:Request,res:Response)=>{
 export const getAllCatPosts = async (req: Request, res: Response): Promise<Response> => {
   try {
     
-    const existingPosts = await CatPost.find();
+    const existingPosts = await CatPost.find().sort({date:-1});
     
     return res.status(200).json({ status:"success", message: "Found Posts", posts:existingPosts });
 
