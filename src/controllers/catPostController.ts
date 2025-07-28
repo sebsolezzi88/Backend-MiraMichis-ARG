@@ -91,6 +91,23 @@ export const getAllCatPosts = async (req: Request, res: Response): Promise<Respo
   }
 }
 
+export const getCatPostsByTypeOfPublication = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const {type} = req.params;
+    if(!type || type === ''){
+      return res.status(400).json({ status:"success", message: "Type of publication required"});
+    }
+
+    const existingPosts = await CatPost.find({typeOfPublication:type}).sort({date:-1});
+    
+    return res.status(200).json({ status:"success", message: "Found Posts", posts:existingPosts });
+
+  } catch (error) {
+    console.error("Error delete post:", error);
+    return res.status(500).json({ status:"error", message: "Server error" });
+  }
+}
+
 export const getCatPostById = async (req: Request, res: Response): Promise<Response> => {
   try {
     
