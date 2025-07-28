@@ -94,6 +94,7 @@ export const getAllCatPosts = async (req: Request, res: Response): Promise<Respo
 export const getCatPostsByTypeOfPublication = async (req: Request, res: Response): Promise<Response> => {
   try {
     const {type} = req.params;
+    console.log(`El tipo es: ${type}`)
     if(!type || type === ''){
       return res.status(400).json({ status:"success", message: "Type of publication required"});
     }

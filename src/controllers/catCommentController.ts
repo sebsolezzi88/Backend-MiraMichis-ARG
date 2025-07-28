@@ -12,7 +12,7 @@ export const getPostComments = async (req: Request, res: Response): Promise<Resp
   try {
     const {catPostId} = req.params; //id del post a comentario
     
-    const existingPost = await CatPost.findById(catPostId);
+    const existingPost = await CatPost.findById(catPostId).populate('userId', 'username avatarUrl');
     
     if(!existingPost){
       return res.status(404).json({ status:"error", message: "Post not Found"});
