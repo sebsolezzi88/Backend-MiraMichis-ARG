@@ -45,9 +45,18 @@ export const addComment = async (req: Request, res: Response): Promise<Response>
     }
 
     const newComment = await Comment.create({catPostId,userId,text});
-    
-    return res.status(200).json({ status:"success", message: "Comment created", comment: newComment});
 
+
+    // Volvemos a buscar el comentario y lo populamos con los campos del usuario
+    const populatedComment = await Comment.findById(newComment._id)
+      .populate('userId', 'username avatarUrl'); // solo los campos deseados
+
+    return res.status(200).json({
+      status: "success",
+      message: "Comment created",
+      comment: populatedComment
+    });
+    
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({ status:"error", message: "Server error" });
