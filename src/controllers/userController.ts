@@ -114,6 +114,7 @@ export const loginUser = async (req:Request,res:Response):Promise<Response> =>{
           username: user.username,
           name: user.name,
           lastName: user.lastName,
+          bio: user.bio,
           role: user.role,
           avatarUrl: user.avatarUrl,
           token
