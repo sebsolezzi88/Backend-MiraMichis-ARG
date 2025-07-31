@@ -181,13 +181,18 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
     await user.save();
 
     //buscar al usuario y solo enviar los campos que necesitamos
-    const userToSend = await User.findById(req.userId).select({
-      username:1,
-      lastName:1,
-      bio:1,
-      avatarUrl:1,
-      location:1
-    }); 
+    const userEdited = await User.findById(req.userId);
+    
+    const userToSend ={
+          userId: userEdited!._id,
+          username: userEdited!.username,
+          name: userEdited!.name!,
+          lastName: userEdited!.lastName,
+          bio: userEdited!.bio!,
+          location: userEdited!.location,
+          role: userEdited!.role,
+          avatarUrl: userEdited!.avatarUrl,
+        }
 
     return res.status(200).json({ status: 'success', message: 'Update successful', user:userToSend }); 
   } catch (error) {
