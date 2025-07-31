@@ -115,6 +115,7 @@ export const loginUser = async (req:Request,res:Response):Promise<Response> =>{
           name: user.name,
           lastName: user.lastName,
           bio: user.bio,
+          location: user.location,
           role: user.role,
           avatarUrl: user.avatarUrl,
           token
@@ -128,7 +129,7 @@ export const loginUser = async (req:Request,res:Response):Promise<Response> =>{
 
 export const updateProfile = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const { name, lastName, bio, city, province } = req.body; // Campos del cuerpo de la solicitud
+    const { name, lastName, bio, location } = req.body; // Campos del cuerpo de la solicitud
 
     const user = await User.findById(req.userId); 
 
@@ -169,17 +170,26 @@ export const updateProfile = async (req: Request, res: Response): Promise<Respon
     
     // Asegurarse de que location exista antes de acceder a sus propiedades
     if (user.location) {
-        if (city !== undefined) user.location.city = city;
-        if (province !== undefined) user.location.province = province;
+        if (location.city !== undefined) user.location.city = location.city;
+        if (location.province !== undefined) user.location.province = location.province;
     } else {
         // Si no existe user.location, puedes inicializarlo o manejar el error
-        user.location = { city: city || '', province: province || '' }; // Asumiendo que City y Province son strings
+        user.location = { city: location.city || '', province: location.province || '' }; 
     }
       
     // Guardamos los cambios
     await user.save();
 
-    return res.status(200).json({ status: 'success', message: 'Update successful', user }); 
+    //buscar al usuario y solo enviar los campos que necesitamos
+    const userToSend = await User.findById(req.userId).select({
+      username:1,
+      lastName:1,
+      bio:1,
+      avatarUrl:1,
+      location:1
+    }); 
+
+    return res.status(200).json({ status: 'success', message: 'Update successful', user:userToSend }); 
   } catch (error) {
     console.error('Error al actualizar el perfil:', error);
     // Puedes añadir lógica para borrar la imagen de Cloudinary si la subida fue exitosa
