@@ -165,3 +165,21 @@ export const getBlogPosts = async (req: Request, res: Response): Promise<Respons
         return res.status(500).json({ status:"error", message: "Server error" });
     }
 }
+
+export const getBlogPostByUserId = async (req: Request, res: Response): Promise<Response> =>{
+    try {
+        
+        
+        const blogPosts = await BlogPost.find({userId:req.userId});
+  
+
+        return res.status(200).json({ 
+            status:"success", 
+            message: "Blog posts found", 
+            blogPosts
+        });
+    } catch (error) {
+        console.error("Error send Message:", error);
+        return res.status(500).json({ status:"error", message: "Server error" });
+    }
+}
