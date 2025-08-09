@@ -152,7 +152,7 @@ export const getBlogPostById = async (req: Request, res: Response): Promise<Resp
 export const getBlogPosts = async (req: Request, res: Response): Promise<Response> => {
     try {
         
-        const blogPosts = await BlogPost.find();
+        const blogPosts = await BlogPost.find().sort({createdAt:-1});
   
 
         return res.status(200).json({ 
