@@ -55,7 +55,7 @@ Este backend está construido con Node.js y Express para manejar usuarios, posts
 
 ---
 
-## 🔐 Seguridad
+### 🔐 Seguridad
 
 - Autenticación mediante JWT.
 - Verificación de roles para rutas administrativas.
@@ -64,7 +64,7 @@ Este backend está construido con Node.js y Express para manejar usuarios, posts
 
 ---
 
-## ⚙ Variables de entorno (`.env`)
+### ⚙ Variables de entorno (`.env`)
 
 ```env
 PORT=
@@ -77,39 +77,50 @@ CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_SECRET_KEY=
 ```
+---
 
-## Tecnologías usadas
+### Tecnologías usadas
 
-    Node.js
+Node.js
 
-    Express
+Express
 
-    MongoDB
+MongoDB
 
-    JWT (jsonwebtoken)
+JWT (jsonwebtoken)
 
-    Multer
+Multer
 
-    Cloudinary
+Cloudinary
 
-    Mailtrap
+Mailtrap
 
-## 📋 Uso
+---
 
-    Clona el repositorio.
+### 📋 Uso
 
-    Configura el archivo .env con tus credenciales.
+Clona el repositorio.
 
-    Ejecuta npm install para instalar dependencias.
+Configura el archivo .env con tus credenciales.
 
-    Ejecuta npm start para iniciar el servidor.
+Ejecuta npm install para instalar dependencias.
 
-## 📝 Notas
+Ejecuta npm start para iniciar el servidor.
 
-    La ruta /api/blog está protegida para que solo administradores puedan crear y modificar posts de blog.
+---
 
-    La funcionalidad de reset de contraseña está integrada con generación de tokens y envío de emails usando Mailtrap para testing.
+### 📝 Notas
 
-    Las imágenes se almacenan en Cloudinary mediante subida con multer.
+La ruta /api/blog está protegida para que solo administradores puedan crear y modificar posts de blog.
 
-    Todos los endpoints que modifican datos requieren token JWT válido.
+La funcionalidad de reset de contraseña está integrada con generación de tokens y envío de emails usando Mailtrap para testing.
+
+Las imágenes se almacenan en Cloudinary mediante subida con multer.
+
+Todos los endpoints que modifican datos requieren token JWT válido.
+
+---
+
+### 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
